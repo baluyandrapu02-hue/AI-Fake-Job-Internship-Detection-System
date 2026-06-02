@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="history-page">
+
+    <div class="history-top-section">
+
+        <div class="history-title-box">
+            <h1>Scan History</h1>
+            <p>View and manage your previous scans</p>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="dashboard-card">
+                <h3>Total Scans</h3>
+                <p>{{ total_scans }}</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Low Risk</h3>
+                <p>{{ low_count }}</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Proceed Carefully</h3>
+                <p>{{ medium_count }}</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>High Risk</h3>
+                <p>{{ high_count }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="history-buttons">
+        <a href="/delete-all-history" class="delete-all-btn">Delete All History</a>
+        <a href="/" class="back-home-btn">Back Home</a>
+
+        {% if favorite_scans|length > 0 %}
+        <a href="/favorites" class="favorite-summary-card">
+            ⭐ Favorites: {{ favorite_scans|length }}
+        </a>
+        {% endif %}
+    </div>
+{% if scans|length == 0 %}
+
+<div class="history-card">
+    <div class="history-center">
+        <h2>No Scan History Yet</h2>
+        <p>
+            Analyze a job or internship to create your first report.
+        </p>
+    </div>
+</div>
+
+{% endif %}
+    {% for scan in scans %}
+
+    <div class="history-card">
+
+        <div class="history-risk-box">
+            <h2>{{ scan.result }}</h2>
+            <p>Risk Score</p>
+            <h3>{{ scan.risk_score }}/100</h3>
+        </div>
+
+        <div class="history-center">
+            <span class="history-type">{{ scan.opportunity_type }}</span>
+
+            <h3>Scanned Content:</h3>
+
+            <div class="history-content-scroll">
+                {{ scan.content[:160] }}...
+            </div>
+        </div>
+
+        <div class="history-right">
+            <p class="history-date">{{ scan.scan_date }}</p>
+            <p class="history-time">{{ scan.scan_time }}</p>
+
+            <a href="/scan/{{ scan.id }}" class="open-btn">Open</a>
+
+            <a href="/favorite/{{ scan.id }}" class="favorite-btn">
+                {% if scan.favorite %}
+                    ★ Favorite
+                {% else %}
+                    ☆ Favorite
+                {% endif %}
+            </a>
+
+            <a href="/delete-scan/{{ scan.id }}" class="delete-btn">Delete</a>
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

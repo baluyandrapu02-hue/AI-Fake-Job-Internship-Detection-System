@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favorite Scans</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="history-page">
+
+    <div class="history-top-section">
+
+        <div class="history-title-box">
+            <h1>⭐ Favorite Scans</h1>
+            <p>View your saved important scans</p>
+        </div>
+
+    </div>
+
+    <div class="history-buttons">
+        <a href="/history" class="back-home-btn">Back to History</a>
+        <a href="/" class="back-home-btn">Back Home</a>
+    </div>
+    {% if scans|length == 0 %}
+
+<div class="history-card">
+    <div class="history-center">
+        <h2>No Favorite Scans Yet</h2>
+        <p>
+            Click the ⭐ Favorite button on any scan to save it here.
+        </p>
+    </div>
+</div>
+
+{% endif %}
+
+    {% for scan in scans %}
+
+    <div class="history-card">
+
+        <div class="history-risk-box">
+            <h2>{{ scan.result }}</h2>
+            <p>Risk Score</p>
+            <h3>{{ scan.risk_score }}/100</h3>
+        </div>
+
+        <div class="history-center">
+            <span class="history-type">{{ scan.opportunity_type }}</span>
+
+            <h3>Scanned Content:</h3>
+
+            <div class="history-content-scroll">
+                {{ scan.content[:160] }}...
+            </div>
+        </div>
+
+        <div class="history-right">
+            <p class="history-date">{{ scan.scan_date }}</p>
+            <p class="history-time">{{ scan.scan_time }}</p>
+
+            <a href="/scan/{{ scan.id }}" class="open-btn">Open</a>
+
+            <a href="/favorite/{{ scan.id }}" class="favorite-btn">
+                ★ Favorite
+            </a>
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fake Job Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="top-bar">
+        <h2 class="welcome-text">Welcome, {{ session['user'] }}</h2>
+
+        <div class="top-buttons">
+            <a href="/logout" class="logout-btn">Logout</a>
+            <a href="/history" class="history-btn">History</a>
+        </div>
+    </div>
+
+    <div class="hero-section">
+        <h1>AI-Based Fake Job & Internship Detection System</h1>
+        <p>Detect suspicious jobs, internships and links using AI-inspired risk analysis.</p>
+    </div>
+
+    <div class="scan-box">
+        <form method="POST">
+            <textarea
+    name="job"
+    id="jobInput"
+    maxlength="3000"
+    placeholder="Paste job description or link here..."
+    required></textarea>
+
+<p id="charCount">0 / 3000 characters</p>
+            <button type="submit" class="scan-btn">Analyze Now</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="result-card">
+
+        <h2 class="{% if 'High Risk' in result %}high-risk{% elif 'Proceed Carefully' in result %}medium-risk{% else %}low-risk{% endif %}">
+            {{ result }}
+        </h2>
+
+        <p><strong>Risk Score:</strong> {{ risk_score }}/100</p>
+        <p><strong>Confidence:</strong> {{ confidence }}%</p>
+        <p><strong>Opportunity Type:</strong> {{ opportunity_type }}</p>
+        <p><strong>Scan Time:</strong> {{ current_date }} | {{ current_time }}</p>
+        <p><strong>Company Status:</strong> {{ company_status }}</p>
+        <p><strong>Link Safety:</strong> {{ link_analysis }}</p>
+         {% if trust_indicators %}
+
+        <div class="trust-box">
+
+          <h3>Trust Indicators</h3>
+
+          <ul>
+            {% for item in trust_indicators %}
+              <li>{{ item }}</li>
+            {% endfor %}
+    </ul>
+
+</div>
+
+{% endif %}
+        <div class="reason-box">
+            <h3>Reasons:</h3>
+            <ul>
+                {% for reason in reasons %}
+                <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if alternatives %}
+        <div class="alternative-box">
+            <h3>Safer Alternatives</h3>
+
+            <div class="safe-links-list">
+                {% for item in alternatives %}
+                <a href="{{ item.url }}" target="_blank" class="safe-text-link">
+                    🔗 {{ item.name }}<br>
+                    {{ item.url }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+</div>
+<script>
+const textarea = document.getElementById("jobInput");
+const counter = document.getElementById("charCount");
+
+textarea.addEventListener("input", function () {
+    counter.textContent =
+        textarea.value.length + " / 3000 characters";
+});
+</script>
+
+</body>
+</html>

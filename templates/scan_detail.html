@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<a href="/history" class="close-btn no-print">X</a>
+
+<div class="detail-page">
+
+    <div class="scan-detail-card">
+
+        <div class="report-header">
+            <h1>AI Fake Job & Internship Risk Report</h1>
+            <button type="button" onclick="downloadPDF()" class="pdf-btn no-print">Export as PDF</button>
+        </div>
+
+        <h2>{{ scan.result }}</h2>
+
+        <p><b>Risk Score:</b> {{ scan.risk_score }}/100</p>
+        <p><b>Confidence:</b> {{ scan.confidence }}%</p>
+        <p><b>Opportunity Type:</b> {{ scan.opportunity_type }}</p>
+        <p><b>Date:</b> {{ scan.scan_date }}</p>
+        <p><b>Time:</b> {{ scan.scan_time }}</p>
+        <p><b>Company Status:</b> {{ scan.company_status }}</p>
+        <p><b>Link Safety:</b> {{ scan.link_analysis }}</p>
+
+        <h3>Reasons</h3>
+        <ul>
+            {% for reason in reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Next Action</h3>
+
+        {% if "High" in scan.result %}
+            <p class="danger-text">Avoid payment. Verify manually before applying.</p>
+        {% elif "Proceed" in scan.result %}
+            <p class="warning-text">Proceed carefully. Check official website and company identity.</p>
+        {% else %}
+            <p class="safe-text">Looks safer. Still apply only through official platforms.</p>
+        {% endif %}
+
+        <h3>Safer Alternatives</h3>
+
+        <div class="safe-links-list">
+            {% for site in alternatives %}
+            <a href="{{ site.url }}" target="_blank" class="safe-text-link">
+                🔗 {{ site.name }} - {{ site.url }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <h3>Scanned Content</h3>
+
+        <div class="scan-content-full">
+            {{ scan.content }}
+        </div>
+
+        <p class="report-note">
+            Disclaimer: This report is generated for educational risk analysis only. Always verify job or internship details manually before applying or making any payment.
+        </p>
+
+    </div>
+
+</div>
+<script>
+function downloadPDF() {
+    setTimeout(function () {
+        window.print();
+    }, 300);
+}
+</script>
+</body>
+</html>

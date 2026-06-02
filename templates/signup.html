@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="auth-container">
+
+    <h1>Signup</h1>
+
+    <form method="POST">
+
+        <input type="text" name="username" placeholder="Username" required>
+
+        <div class="password-box">
+            <input type="password" name="password" id="signupPassword" placeholder="Password" required>
+            <span class="eye" onclick="toggleSignupPassword()">👁</span>
+        </div>
+
+        <button type="submit">Signup</button>
+
+    </form>
+
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+
+    <div class="auth-links">
+        <a href="/login">Already have account?</a>
+    </div>
+
+</div>
+
+<script>
+function toggleSignupPassword() {
+    const password = document.getElementById("signupPassword");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+</script>
+
+</body>
+</html>
