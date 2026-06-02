@@ -79,6 +79,22 @@
             <div class="history-content-scroll">
                 {{ scan.content[:160] }}...
             </div>
+            {% set suspicious_words = ["registration fee", "payment", "pay", "fee", "whatsapp", "telegram", "no interview", "urgent", "instant joining", "limited seats", "security deposit", "processing fee"] %}
+{% set trust_words = ["official website", "company website", "careers", "linkedin.com", "naukri.com", "indeed.com", "internshala.com", "aicte-india.org", "tcs", "infosys", "wipro", "accenture", "google", "microsoft", "amazon"] %}
+<p class="mini-label">Signals:</p>
+<div class="mini-tags">
+    {% for word in suspicious_words %}
+        {% if word in scan.content %}
+            <span class="mini-risk">{{ word }}</span>
+        {% endif %}
+    {% endfor %}
+
+    {% for word in trust_words %}
+        {% if word in scan.content %}
+            <span class="mini-trust">{{ word }}</span>
+        {% endif %}
+    {% endfor %}
+</div>
         </div>
 
         <div class="history-right">

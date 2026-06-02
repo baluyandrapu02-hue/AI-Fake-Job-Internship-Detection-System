@@ -28,6 +28,34 @@
         <p><b>Company Status:</b> {{ scan.company_status }}</p>
         <p><b>Link Safety:</b> {{ scan.link_analysis }}</p>
 
+        {% set suspicious_words = ["registration fee", "payment", "pay", "fee", "whatsapp", "telegram", "no interview", "urgent", "instant joining", "limited seats", "security deposit", "processing fee"] %}
+        {% set trust_words = ["official website", "company website", "careers", "linkedin.com", "naukri.com", "indeed.com", "internshala.com", "aicte-india.org", "tcs", "infosys", "wipro", "accenture", "google", "microsoft", "amazon"] %}
+
+        <div class="signal-box">
+    <h3>Suspicious Signals Found</h3>
+
+    <div class="signal-tags">
+        {% for word in suspicious_words %}
+            {% if word in scan.content %}
+                <span>{{ word }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="trust-box">
+    <h3>Trust Indicators Found</h3>
+
+    <div class="trust-tags">
+        {% for word in trust_words %}
+            {% if word in scan.content %}
+                <span>{{ word }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+        
+
         <h3>Reasons</h3>
         <ul>
             {% for reason in reasons %}
@@ -68,6 +96,7 @@
     </div>
 
 </div>
+
 <script>
 function downloadPDF() {
     setTimeout(function () {
@@ -75,5 +104,6 @@ function downloadPDF() {
     }, 300);
 }
 </script>
+
 </body>
 </html>

@@ -27,13 +27,14 @@
     <div class="scan-box">
         <form method="POST">
             <textarea
-    name="job"
-    id="jobInput"
-    maxlength="3000"
-    placeholder="Paste job description or link here..."
-    required></textarea>
+                name="job"
+                id="jobInput"
+                maxlength="3000"
+                placeholder="Paste job description or link here..."
+                required></textarea>
 
-<p id="charCount">0 / 3000 characters</p>
+            <p id="charCount">0 / 3000 characters</p>
+
             <button type="submit" class="scan-btn">Analyze Now</button>
         </form>
     </div>
@@ -51,28 +52,51 @@
         <p><strong>Scan Time:</strong> {{ current_date }} | {{ current_time }}</p>
         <p><strong>Company Status:</strong> {{ company_status }}</p>
         <p><strong>Link Safety:</strong> {{ link_analysis }}</p>
-         {% if trust_indicators %}
 
+        {% if highlighted_keywords %}
+        <div class="signal-box">
+            <h3>Suspicious Signals Found</h3>
+
+            <div class="signal-tags">
+                {% for keyword in highlighted_keywords %}
+                    <span>{{ keyword }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if trust_indicators %}
         <div class="trust-box">
+            <h3>Trust Indicators</h3>
 
-          <h3>Trust Indicators</h3>
-
-          <ul>
-            {% for item in trust_indicators %}
-              <li>{{ item }}</li>
-            {% endfor %}
-    </ul>
-
-</div>
-
-{% endif %}
-        <div class="reason-box">
-            <h3>Reasons:</h3>
             <ul>
-                {% for reason in reasons %}
-                <li>{{ reason }}</li>
+                {% for item in trust_indicators %}
+                    <li>{{ item }}</li>
                 {% endfor %}
             </ul>
+        </div>
+        {% endif %}
+
+        <div class="reason-box">
+            <h3>Reasons</h3>
+
+            <ul>
+                {% for reason in reasons %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="next-action-box">
+            <h3>Next Action</h3>
+
+            {% if "High" in result %}
+                <p class="danger-text">Avoid payment. Verify manually before applying.</p>
+            {% elif "Proceed" in result %}
+                <p class="warning-text">Proceed carefully. Check official website and company identity.</p>
+            {% else %}
+                <p class="safe-text">Looks safer. Still apply only through official platforms.</p>
+            {% endif %}
         </div>
 
         {% if alternatives %}
@@ -94,14 +118,16 @@
     {% endif %}
 
 </div>
+
 <script>
 const textarea = document.getElementById("jobInput");
 const counter = document.getElementById("charCount");
 
-textarea.addEventListener("input", function () {
-    counter.textContent =
-        textarea.value.length + " / 3000 characters";
-});
+if (textarea && counter) {
+    textarea.addEventListener("input", function () {
+        counter.textContent = textarea.value.length + " / 3000 characters";
+    });
+}
 </script>
 
 </body>
