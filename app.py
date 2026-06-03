@@ -74,8 +74,15 @@ def home():
 
     if request.method == "POST":
         text = request.form["job"].lower()
+        original_text_length = len(text)
+
+        if original_text_length > 8000:
+           text = text[:4000] + " " + text[-4000:]
+           reasons.append(
+                 "Long description detected. Key beginning and ending sections were analyzed for faster processing."
+    )
         risk = 0
-        ml_confidence = 0
+        ml_confidence = 0  
 
         # ML prediction
         if model is not None and vectorizer is not None:

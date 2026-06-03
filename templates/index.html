@@ -29,11 +29,11 @@
             <textarea
                 name="job"
                 id="jobInput"
-                maxlength="3000"
+                maxlength="10000"
                 placeholder="Paste job description or link here..."
                 required></textarea>
 
-            <p id="charCount">0 / 3000 characters</p>
+            <p id="charCount">0 / 10000 characters</p>
 
             <button type="submit" class="scan-btn">Analyze Now</button>
         </form>
@@ -125,7 +125,7 @@ const counter = document.getElementById("charCount");
 
 if (textarea && counter) {
     textarea.addEventListener("input", function () {
-        counter.textContent = textarea.value.length + " / 3000 characters";
+        counter.textContent = textarea.value.length + " / 10000 characters";
     });
 }
 </script>
