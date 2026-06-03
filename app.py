@@ -1,13 +1,30 @@
 import json
+import os
+from datetime import datetime
+
+import joblib
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "fakejobproject"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 
 db = SQLAlchemy(app)
+
+# Load ML model safely
+model = None
+vectorizer = None
+
+try:
+    if os.path.exists("model.pkl") and os.path.exists("vectorizer.pkl"):
+        model = joblib.load("model.pkl")
+        vectorizer = joblib.load("vectorizer.pkl")
+        print("ML model loaded successfully ✅")
+    else:
+        print("ML model files not found. Running rule-based mode only.")
+except Exception as e:
+    print("ML model loading error:", e)
 
 
 class User(db.Model):
@@ -57,8 +74,32 @@ def home():
 
     if request.method == "POST":
         text = request.form["job"].lower()
-
         risk = 0
+        ml_confidence = 0
+
+        # ML prediction
+        if model is not None and vectorizer is not None:
+            try:
+                sample = vectorizer.transform([text])
+                ml_prediction = model.predict(sample)[0]
+                ml_confidence = round(model.predict_proba(sample).max() * 100, 2)
+
+                if ml_prediction == 1:
+                    risk += 15
+                    reasons.append(
+                        f"ML model detected suspicious patterns ({ml_confidence}% confidence)"
+                    )
+                else:
+                    risk = max(0, risk - 5)
+                    reasons.append(
+                        f"ML model found lower risk patterns ({ml_confidence}% confidence)"
+                    )
+
+            except Exception as e:
+                print("ML Prediction Error:", e)
+                reasons.append("ML model unavailable. Rule-based analysis used.")
+        else:
+            reasons.append("Rule-based analysis used. ML model not loaded.")
 
         suspicious_keywords = [
             "registration fee",
@@ -141,6 +182,7 @@ def home():
                 risk += 20
                 reasons.append("Direct WhatsApp/Telegram link detected")
                 trust_indicators.append("❌ WhatsApp/Telegram Contact")
+
             if trusted_found:
                 trust_indicators.append("✅ Official/Trusted Link")
                 risk = max(0, risk - 10)
@@ -178,6 +220,7 @@ def home():
                 risk += 25
                 reasons.append("Payment or registration fee mentioned without strong trust signals")
                 trust_indicators.append("⚠ Payment/Fee Mentioned")
+
         if "whatsapp" in text or "telegram" in text:
             risk += 20
             reasons.append("Uses informal contact method")
@@ -208,6 +251,8 @@ def home():
                 {"name": "Foundit", "url": "https://www.foundit.in"}
             ]
 
+        risk = min(100, max(0, risk))
+
         if risk >= 60:
             result = "High Risk — Verify manually"
         elif risk >= 30:
@@ -216,7 +261,7 @@ def home():
             result = "Low Risk"
 
         risk_score = risk
-        confidence = min(95, 60 + risk)
+        confidence = min(95, max(60 + risk, int(ml_confidence)))
 
         now = datetime.now()
         current_date = now.strftime("%d %b %Y")
@@ -277,7 +322,6 @@ def history():
     ).all()
 
     total_scans = len(scans)
-
     low_count = 0
     medium_count = 0
     high_count = 0
@@ -299,6 +343,8 @@ def history():
         medium_count=medium_count,
         high_count=high_count
     )
+
+
 @app.route("/favorites")
 def favorites():
     if "user" not in session:
@@ -312,18 +358,27 @@ def favorites():
     ).all()
 
     return render_template("favorites.html", scans=scans)
+
+
 @app.route("/favorite/<int:id>")
 def favorite_scan(id):
-    scan = ScanHistory.query.get_or_404(id)
+    if "user" not in session:
+        return redirect("/login")
+
+    scan = ScanHistory.query.filter_by(
+        id=id,
+        username=session["user"]
+    ).first_or_404()
 
     scan.favorite = not scan.favorite
-
     db.session.commit()
 
     return redirect("/history")
+
+
 @app.route("/delete-scan/<int:scan_id>")
 def delete_scan(scan_id):
-    if "user" not in session: 
+    if "user" not in session:
         return redirect("/login")
 
     scan = ScanHistory.query.filter_by(
