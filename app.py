@@ -1,8 +1,11 @@
 import json
 import os
+import re
 from datetime import datetime
 
 import joblib
+import tldextract
+import whois
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,7 +15,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 
 db = SQLAlchemy(app)
 
-# Load ML model safely
 model = None
 vectorizer = None
 
@@ -54,6 +56,54 @@ with app.app_context():
     db.create_all()
 
 
+def extract_first_url(text):
+    urls = re.findall(r"https?://[^\s]+|www\.[^\s]+", text)
+    if urls:
+        return urls[0]
+    return ""
+
+
+def check_domain_age(text):
+    try:
+        url = extract_first_url(text)
+
+        if not url:
+            return "Domain age unavailable", 0, []
+
+        extracted = tldextract.extract(url)
+        domain = f"{extracted.domain}.{extracted.suffix}"
+
+        if not extracted.domain or not extracted.suffix:
+            return "Domain age unavailable", 0, []
+
+        domain_info = whois.whois(domain)
+        creation_date = domain_info.creation_date
+
+        if isinstance(creation_date, list):
+            creation_date = creation_date[0]
+
+        if not creation_date:
+            return "Domain age unavailable", 0, []
+
+        age_days = (datetime.now() - creation_date).days
+        domain_age_info = f"Domain Age: {age_days} days"
+
+        domain_reasons = []
+        extra_risk = 0
+
+        if age_days < 30:
+            extra_risk = 30
+            domain_reasons.append("Newly registered domain detected (less than 30 days old)")
+        elif age_days < 90:
+            extra_risk = 15
+            domain_reasons.append("Recently registered domain detected")
+
+        return domain_age_info, extra_risk, domain_reasons
+
+    except Exception:
+        return "Domain age unavailable", 0, []
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     if "user" not in session:
@@ -74,17 +124,18 @@ def home():
 
     if request.method == "POST":
         text = request.form["job"].lower()
+
         original_text_length = len(text)
 
         if original_text_length > 8000:
-           text = text[:4000] + " " + text[-4000:]
-           reasons.append(
-                 "Long description detected. Key beginning and ending sections were analyzed for faster processing."
-    )
-        risk = 0
-        ml_confidence = 0  
+            text = text[:4000] + " " + text[-4000:]
+            reasons.append(
+                "Long description detected. Key beginning and ending sections were analyzed for faster processing."
+            )
 
-        # ML prediction
+        risk = 0
+        ml_confidence = 0
+
         if model is not None and vectorizer is not None:
             try:
                 sample = vectorizer.transform([text])
@@ -120,7 +171,7 @@ def home():
             "security deposit",
             "processing fee",
             "pay",
-            "fee"
+            "fee",
         ]
 
         for keyword in suspicious_keywords:
@@ -142,7 +193,7 @@ def home():
             "infosys",
             "wipro",
             "accenture",
-            "ibm"
+            "ibm",
         ]
 
         for company in trusted_companies:
@@ -153,6 +204,24 @@ def home():
 
         if "http" in text or "www" in text:
             link_analysis = "Link detected — analyzing trust signals"
+
+            domain_age_info, domain_risk, domain_reasons = check_domain_age(text)
+
+            link_analysis = f"{link_analysis} | {domain_age_info}"
+
+            risk += domain_risk
+
+            risk += domain_risk
+
+            for reason in domain_reasons:
+                reasons.append(reason)
+
+            if domain_risk >= 30:
+                trust_indicators.append("⚠ New Domain")
+            elif domain_risk == 15:
+                trust_indicators.append("⚠ Recently Registered Domain")
+            elif domain_age_info != "Domain age unavailable":
+                trust_indicators.append("✅ Established Domain")
 
             trusted_platforms = [
                 "linkedin.com",
@@ -166,7 +235,7 @@ def home():
                 "wipro.com",
                 "accenture.com",
                 "microsoft.com",
-                "google.com"
+                "google.com",
             ]
 
             trusted_found = False
@@ -222,10 +291,14 @@ def home():
         if payment_detected:
             if trusted_payment_context:
                 risk += 5
-                reasons.append("Fee/payment detected, but official hiring signals found — verify details")
+                reasons.append(
+                    "Fee/payment detected, but official hiring signals found — verify details"
+                )
             else:
                 risk += 25
-                reasons.append("Payment or registration fee mentioned without strong trust signals")
+                reasons.append(
+                    "Payment or registration fee mentioned without strong trust signals"
+                )
                 trust_indicators.append("⚠ Payment/Fee Mentioned")
 
         if "whatsapp" in text or "telegram" in text:
@@ -248,14 +321,14 @@ def home():
             alternatives = [
                 {"name": "Internshala", "url": "https://internshala.com"},
                 {"name": "LinkedIn Jobs", "url": "https://www.linkedin.com/jobs"},
-                {"name": "AICTE Internship Portal", "url": "https://internship.aicte-india.org"}
+                {"name": "AICTE Internship Portal", "url": "https://internship.aicte-india.org"},
             ]
         else:
             alternatives = [
                 {"name": "LinkedIn Jobs", "url": "https://www.linkedin.com/jobs"},
                 {"name": "Naukri", "url": "https://www.naukri.com"},
                 {"name": "Indeed India", "url": "https://in.indeed.com"},
-                {"name": "Foundit", "url": "https://www.foundit.in"}
+                {"name": "Foundit", "url": "https://www.foundit.in"},
             ]
 
         risk = min(100, max(0, risk))
@@ -286,7 +359,7 @@ def home():
             alternatives=json.dumps(alternatives),
             opportunity_type=opportunity_type,
             scan_date=current_date,
-            scan_time=current_time
+            scan_time=current_time,
         )
 
         db.session.add(new_scan)
@@ -306,7 +379,7 @@ def home():
         company_status=company_status,
         alternatives=alternatives,
         link_analysis=link_analysis,
-        username=session["user"]
+        username=session["user"],
     )
 
 
@@ -315,18 +388,17 @@ def history():
     if "user" not in session:
         return redirect("/login")
 
-    scans = ScanHistory.query.filter_by(
-        username=session["user"]
-    ).order_by(
-        ScanHistory.id.desc()
-    ).all()
+    scans = (
+        ScanHistory.query.filter_by(username=session["user"])
+        .order_by(ScanHistory.id.desc())
+        .all()
+    )
 
-    favorite_scans = ScanHistory.query.filter_by(
-        username=session["user"],
-        favorite=True
-    ).order_by(
-        ScanHistory.id.desc()
-    ).all()
+    favorite_scans = (
+        ScanHistory.query.filter_by(username=session["user"], favorite=True)
+        .order_by(ScanHistory.id.desc())
+        .all()
+    )
 
     total_scans = len(scans)
     low_count = 0
@@ -348,7 +420,7 @@ def history():
         total_scans=total_scans,
         low_count=low_count,
         medium_count=medium_count,
-        high_count=high_count
+        high_count=high_count,
     )
 
 
@@ -357,12 +429,11 @@ def favorites():
     if "user" not in session:
         return redirect("/login")
 
-    scans = ScanHistory.query.filter_by(
-        username=session["user"],
-        favorite=True
-    ).order_by(
-        ScanHistory.id.desc()
-    ).all()
+    scans = (
+        ScanHistory.query.filter_by(username=session["user"], favorite=True)
+        .order_by(ScanHistory.id.desc())
+        .all()
+    )
 
     return render_template("favorites.html", scans=scans)
 
@@ -372,10 +443,7 @@ def favorite_scan(id):
     if "user" not in session:
         return redirect("/login")
 
-    scan = ScanHistory.query.filter_by(
-        id=id,
-        username=session["user"]
-    ).first_or_404()
+    scan = ScanHistory.query.filter_by(id=id, username=session["user"]).first_or_404()
 
     scan.favorite = not scan.favorite
     db.session.commit()
@@ -390,7 +458,7 @@ def delete_scan(scan_id):
 
     scan = ScanHistory.query.filter_by(
         id=scan_id,
-        username=session["user"]
+        username=session["user"],
     ).first()
 
     if scan:
@@ -405,9 +473,7 @@ def delete_all_history():
     if "user" not in session:
         return redirect("/login")
 
-    ScanHistory.query.filter_by(
-        username=session["user"]
-    ).delete()
+    ScanHistory.query.filter_by(username=session["user"]).delete()
 
     db.session.commit()
     return redirect("/history")
@@ -420,7 +486,7 @@ def scan_detail(scan_id):
 
     scan = ScanHistory.query.filter_by(
         id=scan_id,
-        username=session["user"]
+        username=session["user"],
     ).first()
 
     if not scan:
@@ -433,7 +499,7 @@ def scan_detail(scan_id):
         "scan_detail.html",
         scan=scan,
         reasons=reasons,
-        alternatives=alternatives
+        alternatives=alternatives,
     )
 
 
@@ -444,7 +510,7 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-
+ 
         user = User.query.filter_by(username=username).first()
 
         if user and user.password == password:
@@ -504,4 +570,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
