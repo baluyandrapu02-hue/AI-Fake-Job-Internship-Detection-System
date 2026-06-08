@@ -1,11 +1,12 @@
-import os
 import joblib
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+print("===== TRAINING STARTED =====")
 
 DATASET_PATH = "dataset/fake_job_postings.csv"
 MODEL_PATH = "model.pkl"
@@ -13,13 +14,7 @@ VECTORIZER_PATH = "vectorizer.pkl"
 
 data = pd.read_csv(DATASET_PATH)
 
-required_columns = ["title", "description", "fraudulent"]
-for col in required_columns:
-    if col not in data.columns:
-        raise ValueError(f"Missing required column: {col}")
-
-data = data[required_columns].dropna()
-
+data = data[["title", "description", "fraudulent"]].dropna()
 data["text"] = data["title"].astype(str) + " " + data["description"].astype(str)
 
 X = data["text"]
@@ -52,10 +47,15 @@ y_pred = model.predict(X_test)
 
 accuracy = accuracy_score(y_test, y_pred)
 
-print("AI Model Trained Successfully ✅")
+
+print("\nAI Model Trained Successfully")
 print(f"Accuracy: {accuracy * 100:.2f}%")
-print("\nClassification Report:")
+
+print("\nPrecision / Recall / F1 Report:")
 print(classification_report(y_test, y_pred))
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
 
 joblib.dump(model, MODEL_PATH)
 joblib.dump(vectorizer, VECTORIZER_PATH)
@@ -73,8 +73,9 @@ confidence = model.predict_proba(sample_vector).max() * 100
 
 print("\nSample Test:")
 if prediction == 1:
-    print("Prediction: High Risk — Verify Manually")
+    print("Prediction: High Risk - Verify Manually")
 else:
     print("Prediction: Low Risk")
 
 print(f"Confidence: {confidence:.2f}%")
+print("===== TRAINING FINISHED =====")
