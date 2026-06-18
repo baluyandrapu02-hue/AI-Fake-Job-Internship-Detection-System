@@ -124,7 +124,45 @@ def home():
 
     if request.method == "POST":
         text = request.form["job"].lower()
+        if not text.strip():
+           result = "Invalid Input"
+           reasons.append("Input cannot be empty. Please paste a job or internship description.")
+           return render_template(
+            "index.html",
+             result=result,
+             risk_score=0,
+             confidence=0,
+             current_date="",
+             current_time="",
+             reasons=reasons,
+             highlighted_keywords=highlighted_keywords,
+             trust_indicators=trust_indicators,
+             opportunity_type="",
+             company_status="",
+             alternatives=[],
+             link_analysis="",
+             username=session["user"],
+    )
 
+        if len(text.strip()) < 30:
+           result = "Invalid Input"
+           reasons.append("Input is too short. Please enter a proper job or internship description.")
+           return render_template(
+              "index.html",
+               result=result,
+               risk_score=0,
+               confidence=0,
+               current_date="",
+               current_time="",
+               reasons=reasons,
+               highlighted_keywords=highlighted_keywords,
+               trust_indicators=trust_indicators,
+               opportunity_type="",
+               company_status="",
+               alternatives=[],
+               link_analysis="",
+               username=session["user"],
+    )
         original_text_length = len(text)
 
         if original_text_length > 8000:

@@ -13,7 +13,15 @@ MODEL_PATH = "model.pkl"
 VECTORIZER_PATH = "vectorizer.pkl"
 
 data = pd.read_csv(DATASET_PATH)
+total_records = len(data)
+real_jobs = data[data["fraudulent"] == 0].shape[0]
+fake_jobs = data[data["fraudulent"] == 1].shape[0]
 
+print("\nDataset Statistics:")
+print(f"Total Records: {total_records}")
+print(f"Real Jobs: {real_jobs}")
+print(f"Fake Jobs: {fake_jobs}")
+print(f"Fake Job Percentage: {(fake_jobs / total_records) * 100:.2f}%")
 data = data[["title", "description", "fraudulent"]].dropna()
 data["text"] = data["title"].astype(str) + " " + data["description"].astype(str)
 
