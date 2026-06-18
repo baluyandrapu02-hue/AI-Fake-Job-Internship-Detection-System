@@ -400,9 +400,15 @@ def home():
             scan_time=current_time,
         )
 
-        db.session.add(new_scan)
-        db.session.commit()
-
+        try:
+            db.session.add(new_scan)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print("Database Save Error:", e)
+            reasons.append(
+                "Scan completed, but history could not be saved due to a database issue."
+            )     
     return render_template(
         "index.html",
         result=result,
