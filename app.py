@@ -8,13 +8,18 @@ import tldextract
 import whois
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 app = Flask(__name__)
 app.secret_key = "fakejobproject"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 
 db = SQLAlchemy(app)
-
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["100 per hour"]
+)
 model = None
 vectorizer = None
 
@@ -103,7 +108,7 @@ def check_domain_age(text):
     except Exception:
         return "Domain age unavailable", 0, []
 
-
+@limiter.limit("10 per minute")
 @app.route("/", methods=["GET", "POST"])
 def home():
     if "user" not in session:
