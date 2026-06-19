@@ -1,0 +1,54 @@
+User
+  |
+  v
+Frontend Interface
+(HTML, CSS, JavaScript)
+  |
+  v
+Flask Backend
+(Python)
+  |
+  v
+Input Validation
+(empty input, short input, long input handling)
+  |
+  v
+Smart Truncation
+(large job descriptions handled safely)
+  |
+  v
+Hybrid Risk Analysis Engine
+  |
+  +---- Rule-Based Detection
+  |     (fee, WhatsApp, Telegram, no interview, urgency)
+  |
+  +---- ML Model
+  |     (TF-IDF + Logistic Regression)
+  |
+  +---- Link Analysis
+  |     (trusted platforms, shortened links, forms)
+  |
+  +---- Domain Age Verification
+  |     (newly registered domain warning)
+  |
+  +---- Trust Indicator Detection
+        (known companies, official links)
+  |
+  v
+Risk Score + Confidence + Reasons
+  |
+  v
+SQLite Database
+  |
+  +---- Users
+  +---- Scan History
+  +---- Favorites
+  |
+  v
+Result Pages
+  |
+  +---- Main Result
+  +---- History
+  +---- Favorites
+  +---- Scan Details
+  +---- PDF Report

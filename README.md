@@ -44,11 +44,26 @@ python app.py
 http://127.0.0.1:5000
 ```
 
+## Current Security  Features
+
+- Machine Learning Based Risk Analysis
+- TF-IDF + Logistic Regression Model
+- Precision, Recall, F1-Score Evaluation
+- Confusion Matrix Evaluation
+- Domain Age Verification
+- Link Safety Analysis
+- Company Trust Indicators
+- Input Validation
+- Database Error Handling
+- Rate Limiting Protection
+
 ## Future Improvements
-- Machine Learning Model Integration
-- Real Company Verification APIs
-- Email Domain Validation
-- Cloud Deployment
+
+- DistilBERT Transformer Model
+- PostgreSQL Database Migration
+- Official Company Verification APIs
+- User Reporting System
+- Advanced Fraud Detection Models
 
 ## Author
 Balu Yandrapu
