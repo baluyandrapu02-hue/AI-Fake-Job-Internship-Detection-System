@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
 
 print("===== TRAINING STARTED =====")
 
@@ -52,6 +52,7 @@ model = LogisticRegression(
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X_test)
+y_prob = model.predict_proba(X_test)[:, 1]
 
 accuracy = accuracy_score(y_test, y_pred)
 
@@ -59,8 +60,19 @@ accuracy = accuracy_score(y_test, y_pred)
 print("\nAI Model Trained Successfully")
 print(f"Accuracy: {accuracy * 100:.2f}%")
 
+
 print("\nPrecision / Recall / F1 Report:")
-print(classification_report(y_test, y_pred))
+print(
+    classification_report(
+        y_test,
+        y_pred,
+        target_names=["Real Job", "Fake Job"]
+    )
+)
+
+print("\nROC-AUC Score:")
+print(roc_auc_score(y_test, y_prob))
+
 
 print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
