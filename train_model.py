@@ -1,5 +1,7 @@
 import joblib
 import pandas as pd
+import re
+import string
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -7,6 +9,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
 
 print("===== TRAINING STARTED =====")
+def clean_text(text):
+    text = str(text)
+    text = text.lower()
+    text = re.sub(r"\s+", " ", text)
+    text = text.translate(str.maketrans("", "", string.punctuation))
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    return text.strip()
 
 DATASET_PATH = "dataset/fake_job_postings.csv"
 MODEL_PATH = "model.pkl"
@@ -23,10 +32,18 @@ print(f"Real Jobs: {real_jobs}")
 print(f"Fake Jobs: {fake_jobs}")
 print(f"Fake Job Percentage: {(fake_jobs / total_records) * 100:.2f}%")
 data = data[["title", "description", "fraudulent"]].dropna()
-data["text"] = data["title"].astype(str) + " " + data["description"].astype(str)
+
+
+data["text"] = (
+    data["title"].astype(str) + " " + data["description"].astype(str)
+)
+
+data["text"] = data["text"].apply(clean_text)
 
 X = data["text"]
 y = data["fraudulent"]
+
+
 
 vectorizer = TfidfVectorizer(
     max_features=7000,
