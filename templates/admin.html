@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="top-bar">
+        <h2 class="welcome-text">Admin Dashboard</h2>
+        <div class="top-buttons">
+            <a href="/" class="history-btn">Home</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="result-card">
+        <h2>System Overview</h2>
+
+        <p><strong>Total Scans:</strong> {{ total_scans }}</p>
+        <p><strong>High Risk:</strong> {{ high_risk }}</p>
+        <p><strong>Proceed Carefully:</strong> {{ medium_risk }}</p>
+        <p><strong>Low Risk:</strong> {{ low_risk }}</p>
+    </div>
+
+    <div class="result-card">
+        <h2>Recent Scan Activity</h2>
+
+        {% if recent_scans %}
+            {% for scan in recent_scans %}
+                <div class="reason-box">
+                    <p><strong>User:</strong> {{ scan.username }}</p>
+                    <p><strong>Result:</strong> {{ scan.result }}</p>
+                    <p><strong>Risk Score:</strong> {{ scan.risk_score }}/100</p>
+                    <p><strong>Date:</strong> {{ scan.scan_date }} | {{ scan.scan_time }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No scans available.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>

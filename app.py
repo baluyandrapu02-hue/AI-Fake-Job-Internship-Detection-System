@@ -468,7 +468,39 @@ def home():
         username=session["user"],
     )
 
+@app.route("/admin")
+def admin_dashboard():
+    if "user" not in session:
+        return redirect("/login")
 
+    if session["user"].lower() != "admin":
+        return redirect("/")
+
+    scans = ScanHistory.query.order_by(ScanHistory.id.desc()).all()
+
+    total_scans = len(scans)
+    high_risk = 0
+    medium_risk = 0
+    low_risk = 0
+
+    for scan in scans:
+        if scan.result and "High Risk" in scan.result:
+            high_risk += 1
+        elif scan.result and "Proceed Carefully" in scan.result:
+            medium_risk += 1
+        else:
+            low_risk += 1
+
+    recent_scans = scans[:10]
+
+    return render_template(
+        "admin.html",
+        total_scans=total_scans,
+        high_risk=high_risk,
+        medium_risk=medium_risk,
+        low_risk=low_risk,
+        recent_scans=recent_scans,
+    )
 @app.route("/history")
 def history():
     if "user" not in session:

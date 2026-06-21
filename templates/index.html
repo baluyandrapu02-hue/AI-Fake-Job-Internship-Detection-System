@@ -14,8 +14,11 @@
         <h2 class="welcome-text">Welcome, {{ session['user'] }}</h2>
 
         <div class="top-buttons">
-            <a href="/logout" class="logout-btn">Logout</a>
-            <a href="/history" class="history-btn">History</a>
+             {% if session['user']|lower == 'admin' %}
+               <a href="/admin" class="history-btn">Admin</a>
+             {% endif %}
+             <a href="/history" class="history-btn">History</a>
+            <a href="/logout" class="logout-btn">Logout</a>    
         </div>
     </div>
 
