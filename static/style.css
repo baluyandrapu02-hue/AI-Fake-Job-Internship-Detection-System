@@ -1011,3 +1011,37 @@ body{
     font-size:20px;
     font-weight:600;
 }
+
+.sample-buttons {
+    margin-top: 14px;
+    margin-bottom: 18px;
+}
+
+.sample-buttons p {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #eef2ff;
+}
+
+.sample-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sample-button-row button {
+    background: #ffffff;
+    color: #3157ff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: auto;
+}
+
+.sample-button-row button:hover {
+    background: #eef2ff;
+}
