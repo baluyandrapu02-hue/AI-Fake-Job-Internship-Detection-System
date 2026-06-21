@@ -27,6 +27,19 @@ try:
     if os.path.exists("model.pkl") and os.path.exists("vectorizer.pkl"):
         model = joblib.load("model.pkl")
         vectorizer = joblib.load("vectorizer.pkl")
+        fake_keyword_weights = []
+
+        if model is not None and vectorizer is not None: 
+           try:
+               feature_names = vectorizer.get_feature_names_out()
+               coefficients = model.coef_[0]
+
+               fake_keyword_weights = sorted(
+                   zip(coefficients, feature_names),
+                   reverse=True
+                )[:20]
+           except Exception as e:
+             print("Keyword Explanation Error:", e)
         print("ML model loaded successfully ✅")
     else:
         print("ML model files not found. Running rule-based mode only.")
@@ -184,7 +197,19 @@ def home():
                 sample = vectorizer.transform([text])
                 ml_prediction = model.predict(sample)[0]
                 ml_confidence = round(model.predict_proba(sample).max() * 100, 2)
+                feature_names = vectorizer.get_feature_names_out()
+                sample_array = sample.toarray()[0]
 
+                matched_keywords = []
+                for score, word in fake_keyword_weights:
+                   try:
+                       word_index = vectorizer.vocabulary_.get(word)
+                       if word_index is not None and sample_array[word_index] > 0:
+                          matched_keywords.append(word)
+                   except:
+                      pass
+
+                highlighted_keywords = matched_keywords[:8]
                 if ml_prediction == 1:
                     risk += 15
                     reasons.append(

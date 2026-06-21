@@ -55,8 +55,8 @@
 
         {% if highlighted_keywords %}
         <div class="signal-box">
-            <h3>Suspicious Signals Found</h3>
-
+            <h3> ML Suspicious Keywords</h3>
+             <p class="small-note">These keywords matched patterns learned by the machine learning model.</p>
             <div class="signal-tags">
                 {% for keyword in highlighted_keywords %}
                     <span>{{ keyword }}</span>
