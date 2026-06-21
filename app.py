@@ -251,17 +251,29 @@ def home():
         if "internship" in text or "intern" in text:
             opportunity_type = "Internship"
 
-        company_status = "Unknown Company — Verify manually"
+        company_status = "Known Company Match Found — Verify official careers page"
 
         trusted_companies = [
-            "google",
-            "amazon",
-            "microsoft",
+            "tata consultancy services",
             "tcs",
             "infosys",
             "wipro",
+            "hcl",
+            "tech mahindra",
             "accenture",
+            "cognizant",
+            "capgemini",
             "ibm",
+            "deloitte",
+            "amazon",
+            "google",
+            "microsoft",
+            "flipkart",
+            "swiggy",
+            "zomato",
+            "paytm",
+            "razorpay",
+            "freshworks",    
         ]
 
         for company in trusted_companies:
