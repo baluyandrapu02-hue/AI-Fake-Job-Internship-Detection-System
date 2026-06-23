@@ -9,10 +9,9 @@
 <div class="history-page">
 
     <div class="history-top-section">
-
         <div class="history-title-box">
             <h1>Scan History</h1>
-            <p>View and manage your previous scans</p>
+            <p>View, export, and manage your previous scans</p>
         </div>
 
         <div class="dashboard-cards">
@@ -36,11 +35,9 @@
                 <p>{{ high_count }}</p>
             </div>
         </div>
-
     </div>
 
     <div class="history-buttons">
-        <a href="/delete-all-history" class="delete-all-btn">Delete All History</a>
         <a href="/" class="back-home-btn">Back Home</a>
 
         {% if favorite_scans|length > 0 %}
@@ -48,21 +45,22 @@
             ⭐ Favorites: {{ favorite_scans|length }}
         </a>
         {% endif %}
-    </div>
-{% if scans|length == 0 %}
 
-<div class="history-card">
-    <div class="history-center">
-        <h2>No Scan History Yet</h2>
-        <p>
-            Analyze a job or internship to create your first report.
-        </p>
+        {% if scans|length > 0 %}
+        <a href="/delete-all-history" class="delete-all-btn">Delete All History</a>
+        {% endif %}
     </div>
-</div>
 
-{% endif %}
+    {% if scans|length == 0 %}
+    <div class="history-card">
+        <div class="history-center">
+            <h2>No Scan History Yet</h2>
+            <p>Analyze a job or internship to create your first report.</p>
+        </div>
+    </div>
+    {% endif %}
+
     {% for scan in scans %}
-
     <div class="history-card">
 
         <div class="history-risk-box">
@@ -79,22 +77,20 @@
             <div class="history-content-scroll">
                 {{ scan.content[:160] }}...
             </div>
-            {% set suspicious_words = ["registration fee", "payment", "pay", "fee", "whatsapp", "telegram", "no interview", "urgent", "instant joining", "limited seats", "security deposit", "processing fee"] %}
-{% set trust_words = ["official website", "company website", "careers", "linkedin.com", "naukri.com", "indeed.com", "internshala.com", "aicte-india.org", "tcs", "infosys", "wipro", "accenture", "google", "microsoft", "amazon"] %}
-<p class="mini-label">Signals:</p>
-<div class="mini-tags">
-    {% for word in suspicious_words %}
-        {% if word in scan.content %}
-            <span class="mini-risk">{{ word }}</span>
-        {% endif %}
-    {% endfor %}
 
-    {% for word in trust_words %}
-        {% if word in scan.content %}
-            <span class="mini-trust">{{ word }}</span>
-        {% endif %}
-    {% endfor %}
-</div>
+            <p class="mini-label">ML Suspicious Keywords:</p>
+
+            <div class="mini-tags">
+                {% set keywords = scan.highlighted_keywords | from_json %}
+
+                {% if keywords|length > 0 %}
+                    {% for word in keywords %}
+                        <span class="mini-risk">{{ word }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="mini-trust">No saved ML keywords</span>
+                {% endif %}
+            </div>
         </div>
 
         <div class="history-right">
@@ -102,6 +98,8 @@
             <p class="history-time">{{ scan.scan_time }}</p>
 
             <a href="/scan/{{ scan.id }}" class="open-btn">Open</a>
+
+            <a href="/download-pdf/{{ scan.id }}" class="open-btn">Export PDF</a>
 
             <a href="/favorite/{{ scan.id }}" class="favorite-btn">
                 {% if scan.favorite %}
@@ -115,10 +113,9 @@
         </div>
 
     </div>
-
     {% endfor %}
 
 </div>
-
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

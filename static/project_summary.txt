@@ -1,0 +1,105 @@
+AI-Based Fake Job & Internship Detection System
+
+This project is a web-based application developed using Python Flask, SQLite, HTML, CSS, and Machine Learning. The system helps users identify potentially fraudulent jobs, internships, and suspicious links by analyzing multiple risk indicators.
+
+The application uses a hybrid approach combining rule-based detection and a Machine Learning model (TF-IDF + Logistic Regression). It evaluates job descriptions, internships, company information, and URLs to generate a risk score, confidence percentage, trust indicators, and detailed reasons for the prediction.
+
+Key Features:
+
+* Fake Job Detection
+* Internship Risk Detection
+* Link Safety Analysis
+* Machine Learning Risk Analysis
+* Domain Age VerificationAI-Based Fake Job & Internship Detection System
+
+This project is a web-based application developed using Python Flask, SQLite, HTML, CSS, and Machine Learning. The system helps users identify potentially fraudulent jobs, internships, and suspicious links by analyzing multiple risk indicators.
+
+The application uses a hybrid approach combining rule-based detection and a Machine Learning model (TF-IDF + Logistic Regression). It evaluates job descriptions, internships, company information, and URLs to generate a risk score, confidence percentage, trust indicators, and detailed reasons for the prediction.
+
+Key Features:
+
+* Fake Job Detection
+* Internship Risk Detection
+* Link Safety Analysis
+* Machine Learning Risk Analysis
+* Domain Age Verification
+* Company Trust Indicators
+* User Authentication
+* Scan History
+* Favorites System
+* PDF Report Export
+* Rate Limiting Protection
+* Input Validation and Error Handling
+
+Technologies Used:
+
+* Python
+* Flask
+* SQLite
+* HTML
+* CSS
+* Scikit-Learn
+* TF-IDF Vectorization
+* Logistic Regression
+* Git & GitHub
+
+Outcome:
+The model achieved approximately 95.6% accuracy on the dataset and provides users with actionable risk assessments to help avoid fraudulent opportunities.
+AI-Based Fake Job & Internship Detection System
+
+This project is a web-based application developed using Python Flask, SQLite, HTML, CSS, and Machine Learning. The system helps users identify potentially fraudulent jobs, internships, and suspicious links by analyzing multiple risk indicators.
+
+The application uses a hybrid approach combining rule-based detection and a Machine Learning model (TF-IDF + Logistic Regression). It evaluates job descriptions, internships, company information, and URLs to generate a risk score, confidence percentage, trust indicators, and detailed reasons for the prediction.
+
+Key Features:
+
+* Fake Job Detection
+* Internship Risk Detection
+* Link Safety Analysis
+* Machine Learning Risk Analysis
+* Domain Age Verification
+* Company Trust Indicators
+* User Authentication
+* Scan History
+* Favorites System
+* PDF Report Export
+* Rate Limiting Protection
+* Input Validation and Error Handling
+
+Technologies Used:
+
+* Python
+* Flask
+* SQLite
+* HTML
+* CSS
+* Scikit-Learn
+* TF-IDF Vectorization
+* Logistic Regression
+* Git & GitHub
+
+Outcome:
+The model achieved approximately 95.6% accuracy on the dataset and provides users with actionable risk assessments to help avoid fraudulent opportunities.
+
+* Company Trust Indicators
+* User Authentication
+* Scan History
+* Favorites System
+* PDF Report Export
+* Rate Limiting Protection
+* Input Validation and Error Handling
+
+Technologies Used:
+
+* Python
+* Flask
+* SQLite
+* HTML
+* CSS
+* Scikit-Learn
+* TF-IDF Vectorization
+* Logistic Regression
+* Git & GitHub
+
+Outcome:
+The model achieved approximately 95.6% accuracy on the dataset and provides users with actionable risk assessments to help avoid fraudulent opportunities.

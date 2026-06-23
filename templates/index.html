@@ -10,23 +10,30 @@
 
 <div class="main-container">
 
+    <!-- TOP BAR -->
     <div class="top-bar">
         <h2 class="welcome-text">Welcome, {{ session['user'] }}</h2>
 
         <div class="top-buttons">
-             {% if session['user']|lower == 'admin' %}
-               <a href="/admin" class="history-btn">Admin</a>
-             {% endif %}
-             <a href="/history" class="history-btn">History</a>
-            <a href="/logout" class="logout-btn">Logout</a>    
+
+            {% if session['user']|lower == 'admin' %}
+                <a href="/admin" class="history-btn">Admin</a>
+            {% endif %}
+
+            <a href="/history" class="history-btn">History</a>
+            <a href="/favorites" class="history-btn">Favorites</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+
         </div>
     </div>
 
+    <!-- HERO SECTION -->
     <div class="hero-section">
         <h1>AI-Based Fake Job & Internship Detection System</h1>
-        <p>Detect suspicious jobs, internships and links using AI-inspired risk analysis.</p>
+        <p>Detect suspicious jobs, internships and links using ML-based risk analysis.</p>
     </div>
 
+    <!-- SCAN BOX -->
     <div class="scan-box">
         <form method="POST">
             <textarea
@@ -37,36 +44,44 @@
                 required></textarea>
 
             <p id="charCount">0 / 10000 characters</p>
-            <div class="sample-buttons">
-                 <p>Try a sample:</p>
-                 <div class="sample-button-row">
-                      <button type="button" onclick="loadSample('fake')">Fake Job Example</button>
-                      <button type="button" onclick="loadSample('real')">Real Job Example</button>
-                      <button type="button" onclick="loadSample('internship')">Internship Scam Example</button>
-                 </div>
-            </div>
+
+ <div class="sample-buttons">
+    <p>Try a sample:</p>
+
+     <div class="sample-button-row">
+         <button type="button" onclick="loadSample('fake')">Fake Job Example</button>
+         <button type="button" onclick="loadSample('internship')">Internship Scam Example</button>
+         <button type="button" onclick="loadSample('fakeLink')">Fake Job Link Example</button>
+         <button type="button" onclick="loadSample('internshipLink')">Fake Internship Link Example</button>
+  </div>
+</div>
+
             <button type="submit" class="scan-btn">Analyze Now</button>
         </form>
     </div>
 
-   {% if result %}
+    <!-- RESULT SECTION -->
+    {% if result %}
     <div class="result-card">
 
         <h2 class="{% if 'High Risk' in result %}high-risk{% elif 'Proceed Carefully' in result %}medium-risk{% else %}low-risk{% endif %}">
-             {{ result }}
+            {{ result }}
         </h2>
 
-        <p><strong>Risk Score:</strong> {{ risk_score }}/100</p>
-        <p><strong>Confidence:</strong> {{ confidence }}%</p>
-        <p><strong>Opportunity Type:</strong> {{ opportunity_type }}</p>
-        <p><strong>Scan Time:</strong> {{ current_date }} | {{ current_time }}</p>
-        <p><strong>Company Status:</strong> {{ company_status }}</p>
-        <p><strong>Link Safety:</strong> {{ link_analysis }}</p>
+        <div class="result-summary">
+            <p><strong>Risk Score:</strong> {{ risk_score }}/100</p>
+            <p><strong>Confidence:</strong> {{ confidence }}%</p>
+            <p><strong>Opportunity Type:</strong> {{ opportunity_type }}</p>
+            <p><strong>Scan Time:</strong> {{ current_date }} | {{ current_time }}</p>
+            <p><strong>Company Status:</strong> {{ company_status }}</p>
+            <p><strong>Link Safety:</strong> {{ link_analysis }}</p>
+        </div>
 
         {% if highlighted_keywords %}
         <div class="signal-box">
-            <h3> ML Suspicious Keywords</h3>
-             <p class="small-note">These keywords matched patterns learned by the machine learning model.</p>
+            <h3>ML Suspicious Keywords</h3>
+            <p class="small-note">These keywords matched patterns learned by the machine learning model.</p>
+
             <div class="signal-tags">
                 {% for keyword in highlighted_keywords %}
                     <span>{{ keyword }}</span>
@@ -87,6 +102,7 @@
         </div>
         {% endif %}
 
+        {% if reasons %}
         <div class="reason-box">
             <h3>Reasons</h3>
 
@@ -96,16 +112,17 @@
                 {% endfor %}
             </ul>
         </div>
+        {% endif %}
 
         <div class="next-action-box">
             <h3>Next Action</h3>
 
             {% if "High" in result %}
-                <p class="danger-text">Avoid payment. Verify manually before applying.</p>
+                <p class="danger-text">Avoid payment. Do not share documents or personal details before verifying manually.</p>
             {% elif "Proceed" in result %}
-                <p class="warning-text">Proceed carefully. Check official website and company identity.</p>
+                <p class="warning-text">Proceed carefully. Check the official website, company domain, and recruiter identity.</p>
             {% else %}
-                <p class="safe-text">Looks safer. Still apply only through official platforms.</p>
+                <p class="safe-text">Looks safer. Still apply only through official platforms or trusted job portals.</p>
             {% endif %}
         </div>
 
@@ -129,35 +146,7 @@
 
 </div>
 
-<script>
-const textarea = document.getElementById("jobInput");
-const counter = document.getElementById("charCount");
 
-const samples = {
-    fake: `Urgent hiring! Work from home. No experience needed. Earn Rs.50000 per month. Registration fee required to confirm slot. Contact through WhatsApp only. No interview required.`,
-
-    real: `TCS is hiring Software Engineer graduates. Candidates must complete an online test, technical interview, and HR round. Apply only through the official TCS careers portal.`,
-
-    internship: `Get certified internship now. Pay Rs.1999 training fee. Certificate valid worldwide. Limited seats available. No interview or selection process required.`
-};
-
-function updateCounter() {
-    if (textarea && counter) {
-        counter.textContent = textarea.value.length + " / 10000 characters";
-    }
-}
-
-function loadSample(type) {
-    if (textarea && samples[type]) {
-        textarea.value = samples[type];
-        updateCounter();
-    }
-}
-
-if (textarea && counter) {
-    textarea.addEventListener("input", updateCounter);
-}
-</script>
-
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

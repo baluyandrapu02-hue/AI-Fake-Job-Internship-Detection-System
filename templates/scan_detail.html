@@ -28,38 +28,27 @@
         <p><b>Company Status:</b> {{ scan.company_status }}</p>
         <p><b>Link Safety:</b> {{ scan.link_analysis }}</p>
 
-        {% set suspicious_words = ["registration fee", "payment", "pay", "fee", "whatsapp", "telegram", "no interview", "urgent", "instant joining", "limited seats", "security deposit", "processing fee"] %}
-        {% set trust_words = ["official website", "company website", "careers", "linkedin.com", "naukri.com", "indeed.com", "internshala.com", "aicte-india.org", "tcs", "infosys", "wipro", "accenture", "google", "microsoft", "amazon"] %}
-
         <div class="signal-box">
-    <h3>Suspicious Signals Found</h3>
+            <h3>ML Suspicious Keywords</h3>
+            <p class="small-note">These keywords were saved from the scan result analysis.</p>
 
-    <div class="signal-tags">
-        {% for word in suspicious_words %}
-            {% if word in scan.content %}
-                <span>{{ word }}</span>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
+            <div class="signal-tags">
+                {% set keywords = scan.highlighted_keywords | from_json %}
 
-<div class="trust-box">
-    <h3>Trust Indicators Found</h3>
-
-    <div class="trust-tags">
-        {% for word in trust_words %}
-            {% if word in scan.content %}
-                <span>{{ word }}</span>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
-        
+                {% if keywords|length > 0 %}
+                    {% for word in keywords %}
+                        <span>{{ word }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span>No saved ML keywords</span>
+                {% endif %}
+            </div>
+        </div>
 
         <h3>Reasons</h3>
         <ul>
             {% for reason in reasons %}
-            <li>{{ reason }}</li>
+                <li>{{ reason }}</li>
             {% endfor %}
         </ul>
 
@@ -77,9 +66,9 @@
 
         <div class="safe-links-list">
             {% for site in alternatives %}
-            <a href="{{ site.url }}" target="_blank" class="safe-text-link">
-                🔗 {{ site.name }} - {{ site.url }}
-            </a>
+                <a href="{{ site.url }}" target="_blank" class="safe-text-link">
+                    🔗 {{ site.name }} - {{ site.url }}
+                </a>
             {% endfor %}
         </div>
 
@@ -90,7 +79,8 @@
         </div>
 
         <p class="report-note">
-            Disclaimer: This report is generated for educational risk analysis only. Always verify job or internship details manually before applying or making any payment.
+            Disclaimer: This report is generated for educational risk analysis only.
+            Always verify job or internship details manually before applying or making any payment.
         </p>
 
     </div>

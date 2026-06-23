@@ -1018,7 +1018,7 @@ body{
 }
 
 .sample-buttons p {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-size: 14px;
     font-weight: 600;
     color: #eef2ff;
@@ -1026,20 +1026,25 @@ body{
 
 .sample-button-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: nowrap;
 }
 
 .sample-button-row button {
-    background: #ffffff;
-    color: #3157ff;
+    width: auto;
+    min-width: auto;
+    padding: 10px 18px;
     border: none;
     border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 14px;
-    font-weight: 600;
+    background: #ffffff;
+    color: #1d4ed8;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    width: auto;
+    white-space: nowrap;
 }
 
 .sample-button-row button:hover {
